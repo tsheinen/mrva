@@ -89,18 +89,16 @@ async def main(args, argv):
         else:
             raise Exception(f"Unknown download command {args.download_command}")
 
-        gather_tasks = [
-            asyncio.create_task(
-                util.zip_gather(
-                    repo_page,
-                    lambda repo: download_database_contents(
-                        client,
-                        repo["full_name"],
-                        args.language,
-                        args.mrva_dir,
-                    ),
+        semaphore = asyncio.Semaphore(20)
+
+        async def bounded_download(repo):
+            async with semaphore:
+                return await download_database_contents(
+                    client, repo["full_name"], args.language, args.mrva_dir
                 )
-            )
+
+        gather_tasks = [
+            asyncio.create_task(util.zip_gather(repo_page, bounded_download))
             async for repo_page in repo_pages
         ]
         gathered = await asyncio.gather(*gather_tasks)
