@@ -21,6 +21,7 @@ def gh_item_limiter(limit, key="items"):
 
 RETRIES = {
     httpx.codes.TOO_MANY_REQUESTS: 60,
+    httpx.codes.FORBIDDEN: 60,
     httpx.ConnectError: 5,
     httpx.PoolTimeout: 5,
 }

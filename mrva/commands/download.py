@@ -52,8 +52,8 @@ async def download_database_contents(client, repo, language, mrva_dir):
     except RuntimeError:
         logger.warning("Could not download %s database for %s: retries exceeded", language, repo)
         return (False, "", "", "")
-    if json_resp.status_code == httpx.codes.FORBIDDEN:
-        logger.debug("Code scanning not enabled for %s, skipping", repo)
+    if json_resp.status_code == httpx.codes.NOT_FOUND:
+        logger.debug("No %s CodeQL database for %s, skipping", language, repo)
         return (False, "", "", "")
     if json_resp.status_code != httpx.codes.OK:
         logger.warning("Could not download %s database json for %s (status %d)", language, repo, json_resp.status_code)
