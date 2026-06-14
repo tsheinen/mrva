@@ -96,6 +96,13 @@ def parse_args(args):
         help="HTTP request timeout"
     )
     download_parser.add_argument(
+        "--concurrency",
+        action="store",
+        type=int,
+        default=5,
+        help="Maximum number of concurrent downloads (default: 5)"
+    )
+    download_parser.add_argument(
         "-l",
         "--language",
         action="store",

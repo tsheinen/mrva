@@ -93,7 +93,7 @@ async def main(args, argv):
         else:
             raise Exception(f"Unknown download command {args.download_command}")
 
-        semaphore = asyncio.Semaphore(20)
+        semaphore = asyncio.Semaphore(args.concurrency)
 
         async def bounded_download(repo):
             async with semaphore:
