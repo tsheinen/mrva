@@ -56,7 +56,7 @@ async def retry(fn, *args, count=5, timeout=60, **kwargs):
         else:
             return response
 
-    logging.warning("Retry exceeded for %s", args[0])
+    raise RuntimeError(f"Retry exceeded for {args[0]}")
 
 
 class Client:

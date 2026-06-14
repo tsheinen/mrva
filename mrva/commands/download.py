@@ -44,10 +44,14 @@ async def download_database_contents(client, repo, language, mrva_dir):
     # There's a slight data race here, but I think it's the best we can do.
     # The GH API does not allow us to obtain the database contents and
     # corresponding commit hash info in a single request.
-    json_resp, content_resp = await asyncio.gather(
-        client.get_codeql_database(repo, language, content=False),
-        client.get_codeql_database(repo, language, content=True),
-    )
+    try:
+        json_resp, content_resp = await asyncio.gather(
+            client.get_codeql_database(repo, language, content=False),
+            client.get_codeql_database(repo, language, content=True),
+        )
+    except RuntimeError:
+        logger.warning("Could not download %s database for %s: retries exceeded", language, repo)
+        return (False, "", "", "")
     if json_resp.status_code != httpx.codes.OK:
         logger.warning("Could not download %s database json for %s", repo, language)
         return (False, "", "", "")
