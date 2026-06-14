@@ -52,11 +52,14 @@ async def download_database_contents(client, repo, language, mrva_dir):
     except RuntimeError:
         logger.warning("Could not download %s database for %s: retries exceeded", language, repo)
         return (False, "", "", "")
+    if json_resp.status_code == httpx.codes.FORBIDDEN:
+        logger.debug("Code scanning not enabled for %s, skipping", repo)
+        return (False, "", "", "")
     if json_resp.status_code != httpx.codes.OK:
-        logger.warning("Could not download %s database json for %s", repo, language)
+        logger.warning("Could not download %s database json for %s (status %d)", language, repo, json_resp.status_code)
         return (False, "", "", "")
     if content_resp.status_code != httpx.codes.OK:
-        logger.warning("Could not download %s database content for %s", repo, language)
+        logger.warning("Could not download %s database content for %s (status %d)", language, repo, content_resp.status_code)
         return (False, "", "", "")
 
     commit = json_resp.json()["commit_oid"]
